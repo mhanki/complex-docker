@@ -1,0 +1,35 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - master
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Sign into Docker
+      - run: docker login -u DOCKER_USERNAME -p DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      
+      # Build client from dev version to run tests
+      - run: docker build -t mhanki/react-test -f ./client/Dockerfile.dev ./client
+      # Run test script
+      - run: docker run -e CI=true mhanki/react-test npm test
+
+      # Build production images
+      - run: docker build -t mhanki/multi-client ./client
+      - run: docker build -t mhanki/multi-nginx ./nginx
+      - run: docker build -t mhanki/multi-server ./server
+      - run: docker build -t mhankni/multi-worker ./worker
+ 
+      # Push to DockerHub
+      - run: docker push mhanki/multi-client
+      - run: docker push mhanki/multi-nginx
+      - run: docker push mhanki/multi-server
+      - run: docker push mhanki/multi-worker     
+    
