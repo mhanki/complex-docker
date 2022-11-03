@@ -22,7 +22,7 @@ jobs:
       - run: docker build -t mhanki/multi-client ./client
       - run: docker build -t mhanki/multi-nginx ./nginx
       - run: docker build -t mhanki/multi-server ./server
-      - run: docker build -t mhankni/multi-worker ./worker
+      - run: docker build -t mhanki/multi-worker ./worker
  
       # Push to DockerHub
       - run: docker push mhanki/multi-client
